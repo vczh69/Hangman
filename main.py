@@ -63,7 +63,9 @@ class Hangman:
         # Guess Entry
         self.entry_frame = tk.LabelFrame(self.frame, text="Guess", font=("Arial", 10))
         self.entry_frame.grid(row=2, column=0, pady=10)
-        self.guess_entry = ttk.Entry(self.entry_frame, width=23)
+
+        validate_cmd = self.frame.register(self.validate_input)
+        self.guess_entry = ttk.Entry(self.entry_frame, width=23, validate='key', validatecommand=(validate_cmd, '%P'))
         self.guess_entry.grid(row=0, column=0, padx=5, pady=5)
 
         # Guess Button
@@ -75,6 +77,9 @@ class Hangman:
         # Tries Label
         self.tries_label = ttk.Label(self.frame, text=f"Tries: {self.tries}/{self.max_tries}", font=("Arial", 15))
         self.tries_label.grid(row=4, column=0, pady=10)
+
+    def validate_input(self, input_text):
+        return input_text.isalpha() and len(input_text) <= 1 or input_text == ''
 
     def guess(self):
         self.input = self.guess_entry.get()
@@ -96,6 +101,8 @@ class Hangman:
         if self.tries == self.max_tries:
             result = messagebox.askquestion("Game Over", f"You lost. The word was: {self.secret_word}\nDo you want to restart?", icon='error')
             self.handle_game_result(result)
+
+        self.guess_entry.delete(0, tk.END)
 
     def handle_game_result(self, result):
         if result == 'yes':
